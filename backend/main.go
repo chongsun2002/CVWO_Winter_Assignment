@@ -9,6 +9,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
+	"github.com/chongsun2002/CVWO_Winter_Assignment/internal/database"
+	"github.com/lib/pq"
 )
 
 func main(){
@@ -18,7 +20,13 @@ func main(){
 	if portString == "" {
 		log.Fatal("PORT is not found in the dotenv file")
 	}
-	fmt.Println("Port: ", portString)
+
+	// Connect to Database
+	dbURL := os.Getenv("DB_URL")
+	if dbURL == "" {
+		log.Fatal("DB_URL not found in the dotenv file")
+	}
+	conn, err := sql.Open("postgres", dbURL)
 
 	// Set Up Router
 	router := chi.NewRouter()
@@ -36,8 +44,8 @@ func main(){
 
 	v1Router := chi.NewRouter()
 	v1Router.Get("/healthz", handler_healthz) // Route to check if server is running/health of server
-	v1Router.Get("/error", handler_error)
-
+	v1Router.Get("/error", handler_error) // Route for errors
+	
 	router.Mount("/v1", v1Router)
 
 	// Set Up Server Configurations
