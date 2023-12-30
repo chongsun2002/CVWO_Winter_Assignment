@@ -1,17 +1,21 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"database/sql"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
-	"github.com/chongsun2002/CVWO_Winter_Assignment/internal/database"
-	"github.com/lib/pq"
+	"github.com/chongsun2002/CVWO_Winter_Assignment/backend/internal/database"
+	_ "github.com/lib/pq"
 )
+
+type apiConfig struct {
+	DB *database.Queries
+};
 
 func main(){
 	// Load environment variables and connect to port
@@ -26,7 +30,17 @@ func main(){
 	if dbURL == "" {
 		log.Fatal("DB_URL not found in the dotenv file")
 	}
+
 	conn, err := sql.Open("postgres", dbURL)
+	if err != nil {
+		log.Fatal("Can't connect to database: ", err)
+	}
+
+	log.Printf("Connected to Database")
+	dbQueries := database.New(conn)
+	apiCfg := apiConfig{
+		DB: dbQueries,
+	}
 
 	// Set Up Router
 	router := chi.NewRouter()
@@ -45,6 +59,7 @@ func main(){
 	v1Router := chi.NewRouter()
 	v1Router.Get("/healthz", handler_healthz) // Route to check if server is running/health of server
 	v1Router.Get("/error", handler_error) // Route for errors
+	v1Router.Post("/users", apiCfg.handlerCreateUser)
 	
 	router.Mount("/v1", v1Router)
 
