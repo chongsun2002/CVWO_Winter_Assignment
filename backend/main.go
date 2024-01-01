@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"os"
 	"database/sql"
+	"github.com/chongsun2002/CVWO_Winter_Assignment/backend/internal/database"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
-	"github.com/chongsun2002/CVWO_Winter_Assignment/backend/internal/database"
 	_ "github.com/lib/pq"
 )
 
@@ -60,6 +60,8 @@ func main(){
 	v1Router.Get("/healthz", handler_healthz) // Route to check if server is running/health of server
 	v1Router.Get("/error", handler_error) // Route for errors
 	v1Router.Post("/users", apiCfg.handlerCreateUser)
+	v1Router.Post("/changepassword", apiCfg.handlerChangePassword)
+	//v1Router.Post("/authenticate")
 	
 	router.Mount("/v1", v1Router)
 
@@ -71,8 +73,5 @@ func main(){
 	log.Printf("Server starting on port %v", portString)
 
 	// Start Server and catch error
-	err := server.ListenAndServe()
-	if err != nil {
-		log.Fatal(err)
-	}
+	log.Fatal(server.ListenAndServe())
 }

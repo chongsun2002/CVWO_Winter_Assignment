@@ -6,6 +6,7 @@ package database
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -13,8 +14,8 @@ import (
 type Comment struct {
 	Commentid    uuid.UUID
 	Content      sql.NullString
-	Lastmodified sql.NullTime
-	Isedited     sql.NullBool
+	Lastmodified time.Time
+	Isedited     bool
 	Upvotes      int32
 	Downvotes    int32
 	Userid       uuid.NullUUID
@@ -25,16 +26,16 @@ type Post struct {
 	Postid       uuid.UUID
 	Title        string
 	Content      sql.NullString
-	Lastmodified sql.NullTime
-	Isedited     sql.NullBool
-	Upvotes      sql.NullInt32
-	Downvotes    sql.NullInt32
+	Lastmodified time.Time
+	Isedited     bool
+	Upvotes      int32
+	Downvotes    int32
 	Userid       uuid.NullUUID
 }
 
 type User struct {
 	Userid       uuid.UUID
 	Name         string
-	Lastmodified sql.NullTime
+	Lastmodified time.Time
 	Password     string
 }
