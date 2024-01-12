@@ -6,11 +6,11 @@ import { Link as ChakraLink } from '@chakra-ui/react'
 
 const SideBar: React.FC = () => {
     return (
-        <Container>
+        <Container border='1px' borderColor='gray.200' p='8' minHeight='calc(100vh - 70px)'>
             <Heading size='sm'>
                 Topics
             </Heading>
-            <List spacing={3} mt={5}>
+            <List spacing='3' mt='5'>
                 <ListItem>
                     <ChakraLink as={ReactRouterLink} to='/Academics'>Academics</ChakraLink>
                 </ListItem>

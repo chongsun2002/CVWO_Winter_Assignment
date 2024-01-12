@@ -1,10 +1,14 @@
 import * as React from "react"
 
+import { Container, InputGroup, Input, InputLeftElement } from "@chakra-ui/react"
+
 const LoginPage = () => {
     return (
-        <div>
-            Login
-        </div>
+        <Container>
+            <InputGroup>
+                <Input></Input>
+            </InputGroup>
+        </Container>
     )
 }
 

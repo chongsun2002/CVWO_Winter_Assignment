@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Outlet } from 'react-router-dom'
 
-import {  Grid, GridItem } from '@chakra-ui/react'
+import { Grid, GridItem } from '@chakra-ui/react'
 
 import NavBar from './NavBar'
 import SideBar from './SideBar'
@@ -12,9 +12,8 @@ const RootLayout: React.FC = () => {
         <Grid
             templateAreas={`'nav nav'
                             'side main'`}
-            gridTemplateRows={'50px 1fr 30px'}
-            gridTemplateColumns={'150px 1fr'}   
-            gap='6'
+            gridTemplateRows={'70px 1fr'}
+            gridTemplateColumns={'1fr 7fr'}
         >
             <GridItem area={'nav'}>
                 <NavBar />
