@@ -8,12 +8,26 @@ import { createBrowserRouter, BrowserRouterProps, createRoutesFromElements, Rout
 import PostsList from "./components/PostsList"
 import RootLayout from "./components/RootLayout"
 import LoginPage from "./components/LoginPage"
+import ResetPassword from "./components/ResetPassword"
+import SignupPage from "./components/SignupPage"
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<RootLayout />}>
-      <Route index element={<PostsList />}/>
+      <Route index element={<PostsList topic="all"/>}/>
+      <Route path="posts">
+        <Route index element={<PostsList topic="all"/>}/>
+        <Route path="academics" element={<PostsList topic="academics"/>}/>
+        <Route path="activitiesevents" element={<PostsList topic="activitiesevents"/>}/>
+        <Route path="clubsocs" element={<PostsList topic="clubsocs"/>}/>
+        <Route path="recruitment" element={<PostsList topic="recruitment"/>}/>
+        <Route path="social" element={<PostsList topic="social"/>}/>
+        <Route path="others" element={<PostsList topic="others"/>}/>
+      </Route>
       <Route path="login" element={<LoginPage />}/>
+      <Route path="resetpassword" element={<ResetPassword />}/>
+      <Route path="signup" element={<SignupPage />}/>
+      <Route/>
     </Route>
   )
 )

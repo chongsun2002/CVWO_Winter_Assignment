@@ -59,6 +59,7 @@ func main(){
 	v1Router := chi.NewRouter()
 	v1Router.Get("/healthz", handler_healthz) // Route to check if server is running/health of server
 	v1Router.Get("/error", handler_error) // Route for errors
+	v1Router.Get("/posts", apiCfg.handlerGetPosts)
 	v1Router.Post("/users", apiCfg.handlerCreateUser)
 	v1Router.Post("/changepassword", apiCfg.handlerChangePassword)
 	//v1Router.Post("/authenticate")

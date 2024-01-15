@@ -13,13 +13,13 @@ import (
 	"github.com/google/uuid"
 )
 
-const createComment = `-- name: CreateComment :one
+const createComment = `-- name: createComment :one
 INSERT INTO Comments (CommentID, Content, LastModified, IsEdited, Upvotes, Downvotes, UserID, PostID)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING commentid, content, lastmodified, isedited, upvotes, downvotes, userid, postid
 `
 
-type CreateCommentParams struct {
+type createCommentParams struct {
 	Commentid    uuid.UUID
 	Content      sql.NullString
 	Lastmodified time.Time
@@ -30,7 +30,7 @@ type CreateCommentParams struct {
 	Postid       uuid.NullUUID
 }
 
-func (q *Queries) CreateComment(ctx context.Context, arg CreateCommentParams) (Comment, error) {
+func (q *Queries) createComment(ctx context.Context, arg createCommentParams) (Comment, error) {
 	row := q.db.QueryRowContext(ctx, createComment,
 		arg.Commentid,
 		arg.Content,

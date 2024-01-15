@@ -1,12 +1,12 @@
--- name: CreatePost :one
-INSERT INTO Posts (PostID, Content, LastModified, IsEdited, Upvotes, Downvotes, UserID)
-VALUES ($1, $2, $3, $4, $5, $6, $7)
+-- name: createPost :one
+INSERT INTO Posts (PostID, Title, Content, Topic, LastModified, IsEdited, Upvotes, Downvotes, UserID)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 RETURNING *;
 --
 
 -- name: editPost :exec
 UPDATE Posts
-SET Content = $3, IsEdited = true
+SET Content = $3, IsEdited = true, LastModified=$4
 WHERE UserID = $2 and PostID = $1;
 --
 
@@ -16,7 +16,10 @@ SET Content = "Deleted"
 WHERE UserID = $2 and PostID = $1;
 --
 
--- name: getPost :many
+-- name: getPosts :many
 SELECT * FROM Posts 
-WHERE PostID = $1;
+WHERE PostID = $1 and Topic = $2
+ORDER BY PostID
+OFFSET $3
+LIMIT $4;
 --

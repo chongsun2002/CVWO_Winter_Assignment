@@ -26,6 +26,7 @@ type Post struct {
 	Postid       uuid.UUID
 	Title        string
 	Content      sql.NullString
+	Topic        sql.NullString
 	Lastmodified time.Time
 	Isedited     bool
 	Upvotes      int32
@@ -36,6 +37,7 @@ type Post struct {
 type User struct {
 	Userid       uuid.UUID
 	Name         string
+	Email        string
 	Lastmodified time.Time
 	Password     string
 }

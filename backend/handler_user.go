@@ -13,6 +13,7 @@ func (apiCfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Reques
 	type parameters struct {
 		Name string
 		Password string
+		Email string
 	}
 	// Decode JSON to Go Struct
 	decoder := json.NewDecoder(r.Body)
@@ -29,9 +30,10 @@ func (apiCfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	// Database API
-	user, err := apiCfg.DB.CreateUser(r.Context(), database.CreateUserParams{
+	user, err := apiCfg.DB.createUser(r.Context(), database.createUserParams{
 		Userid: uuid.New(),
 		Name: params.Name,
+		Email: params.Email,
 		Lastmodified: time.Now().In(location),
 		Password: params.Password,
 	})
@@ -58,7 +60,7 @@ func (apiCfg *apiConfig) handlerChangePassword(w http.ResponseWriter, r *http.Re
 	}
 	// Database API
 
-	RowsAffected, err := apiCfg.DB.ChangePassword(r.Context(), database.ChangePasswordParams{
+	RowsAffected, err := apiCfg.DB.changePassword(r.Context(), database.changePasswordParams{
 		Name: params.Name,
 		Password: params.Password,
 		Password_2: params.Password_2,
@@ -89,7 +91,7 @@ func (apiCfg *apiConfig) handlerAuthenticateUser(w http.ResponseWriter, r *http.
 	}
 	// Database API
 
-	count, err := apiCfg.DB.ChangePassword(r.Context(), database.ChangePasswordParams{
+	count, err := apiCfg.DB.changePassword(r.Context(), database.changePasswordParams{
 		Name: params.Name,
 		Password: params.Password,
 	})

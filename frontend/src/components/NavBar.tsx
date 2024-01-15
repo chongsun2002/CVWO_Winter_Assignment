@@ -1,23 +1,32 @@
 import * as React from "react"
-import { Flex, Heading, Spacer, Input, InputGroup, InputLeftElement, InputRightElement, Button, ButtonGroup, Box } from "@chakra-ui/react"
+import { Flex, Heading, Spacer, Input, InputGroup, InputLeftElement, Button, ButtonGroup, Box, LinkBox, LinkOverlay, Image, HStack } from "@chakra-ui/react"
 import { SearchIcon } from "@chakra-ui/icons"
 import { Link as ReactRouterLink } from "react-router-dom"
 
 const NavBar: React.FC = () => {
     return (
-        <Flex minWidth='max-content' h='70px' alignItems='center' gap='2' border='1px' borderColor='gray.200'>
-            <Box p='4'>
-                <Heading size='lg'>NograssforUS</Heading>
-            </Box>
-            <InputGroup>
+        <Flex minWidth='max-content' h='100px' alignItems='center' gap='2' borderBottom='1px' borderBottomColor='gray.200'>
+            <LinkBox ml='5vw'>
+                <HStack p='4'>
+                    <Image src='logo192.png' boxSize='75px'></Image>
+                    <Heading size='lg'>
+                        <LinkOverlay as={ReactRouterLink} to='/'>
+                            NograssforUS
+                        </LinkOverlay>
+                    </Heading>
+                </HStack>
+            </LinkBox>
+            <Spacer/>
+            <InputGroup width="40vw">
                 <InputLeftElement>
                     <SearchIcon />
                 </InputLeftElement>
-                <Input placeholder="Search Posts"></Input>
+                <Input placeholder="Search Posts" />
             </InputGroup>
-            <ButtonGroup gap='2' ml='15' mr='15'>
+            <Spacer/>
+            <ButtonGroup gap='6' mr='5vw'>
                 <Button colorScheme='teal'>
-                    <ReactRouterLink to="">Sign Up</ReactRouterLink>
+                    <ReactRouterLink to="/signup">Sign Up</ReactRouterLink>
                 </Button>
                 <Button colorScheme='teal'>
                     <ReactRouterLink to="/login">Log In</ReactRouterLink>

@@ -5,15 +5,14 @@ import { Grid, GridItem } from '@chakra-ui/react'
 
 import NavBar from './NavBar'
 import SideBar from './SideBar'
-import PostsList from './PostsList'
 
 const RootLayout: React.FC = () => {
     return (
         <Grid
             templateAreas={`'nav nav'
                             'side main'`}
-            gridTemplateRows={'70px 1fr'}
-            gridTemplateColumns={'1fr 7fr'}
+            gridTemplateRows={'100px'}
+            gridTemplateColumns={'1fr 4fr'}
         >
             <GridItem area={'nav'}>
                 <NavBar />
