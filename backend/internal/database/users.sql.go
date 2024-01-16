@@ -12,38 +12,38 @@ import (
 	"github.com/google/uuid"
 )
 
-const authenticateUser = `-- name: authenticateUser :one
+const authenticateUser = `-- name: AuthenticateUser :one
 
 SELECT count(*) FROM Users
 WHERE Name = $1 AND Password = $2
 `
 
-type authenticateUserParams struct {
+type AuthenticateUserParams struct {
 	Name     string
 	Password string
 }
 
-func (q *Queries) authenticateUser(ctx context.Context, arg authenticateUserParams) (int64, error) {
+func (q *Queries) AuthenticateUser(ctx context.Context, arg AuthenticateUserParams) (int64, error) {
 	row := q.db.QueryRowContext(ctx, authenticateUser, arg.Name, arg.Password)
 	var count int64
 	err := row.Scan(&count)
 	return count, err
 }
 
-const changePassword = `-- name: changePassword :execrows
+const changePassword = `-- name: ChangePassword :execrows
 
 UPDATE Users 
 SET Password = $3
 WHERE Name = $1 and Password = $2
 `
 
-type changePasswordParams struct {
+type ChangePasswordParams struct {
 	Name       string
 	Password   string
 	Password_2 string
 }
 
-func (q *Queries) changePassword(ctx context.Context, arg changePasswordParams) (int64, error) {
+func (q *Queries) ChangePassword(ctx context.Context, arg ChangePasswordParams) (int64, error) {
 	result, err := q.db.ExecContext(ctx, changePassword, arg.Name, arg.Password, arg.Password_2)
 	if err != nil {
 		return 0, err
@@ -51,13 +51,13 @@ func (q *Queries) changePassword(ctx context.Context, arg changePasswordParams) 
 	return result.RowsAffected()
 }
 
-const createUser = `-- name: createUser :one
+const createUser = `-- name: CreateUser :one
 INSERT INTO Users (UserID, Name, Email, LastModified, Password)
 VALUES ($1, $2, $3, $4, $5)
 RETURNING userid, name, email, lastmodified, password
 `
 
-type createUserParams struct {
+type CreateUserParams struct {
 	Userid       uuid.UUID
 	Name         string
 	Email        string
@@ -65,7 +65,7 @@ type createUserParams struct {
 	Password     string
 }
 
-func (q *Queries) createUser(ctx context.Context, arg createUserParams) (User, error) {
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
 	row := q.db.QueryRowContext(ctx, createUser,
 		arg.Userid,
 		arg.Name,

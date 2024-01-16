@@ -13,13 +13,13 @@ import (
 	"github.com/google/uuid"
 )
 
-const createPost = `-- name: createPost :one
+const createPost = `-- name: CreatePost :one
 INSERT INTO Posts (PostID, Title, Content, Topic, LastModified, IsEdited, Upvotes, Downvotes, UserID)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 RETURNING postid, title, content, topic, lastmodified, isedited, upvotes, downvotes, userid
 `
 
-type createPostParams struct {
+type CreatePostParams struct {
 	Postid       uuid.UUID
 	Title        string
 	Content      sql.NullString
@@ -31,7 +31,7 @@ type createPostParams struct {
 	Userid       uuid.NullUUID
 }
 
-func (q *Queries) createPost(ctx context.Context, arg createPostParams) (Post, error) {
+func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, error) {
 	row := q.db.QueryRowContext(ctx, createPost,
 		arg.Postid,
 		arg.Title,
@@ -58,38 +58,38 @@ func (q *Queries) createPost(ctx context.Context, arg createPostParams) (Post, e
 	return i, err
 }
 
-const deletePost = `-- name: deletePost :exec
+const deletePost = `-- name: DeletePost :exec
 
 UPDATE Posts
 SET Content = "Deleted"
 WHERE UserID = $2 and PostID = $1
 `
 
-type deletePostParams struct {
+type DeletePostParams struct {
 	Postid uuid.UUID
 	Userid uuid.NullUUID
 }
 
-func (q *Queries) deletePost(ctx context.Context, arg deletePostParams) error {
+func (q *Queries) DeletePost(ctx context.Context, arg DeletePostParams) error {
 	_, err := q.db.ExecContext(ctx, deletePost, arg.Postid, arg.Userid)
 	return err
 }
 
-const editPost = `-- name: editPost :exec
+const editPost = `-- name: EditPost :exec
 
 UPDATE Posts
 SET Content = $3, IsEdited = true, LastModified=$4
 WHERE UserID = $2 and PostID = $1
 `
 
-type editPostParams struct {
+type EditPostParams struct {
 	Postid       uuid.UUID
 	Userid       uuid.NullUUID
 	Content      sql.NullString
 	Lastmodified time.Time
 }
 
-func (q *Queries) editPost(ctx context.Context, arg editPostParams) error {
+func (q *Queries) EditPost(ctx context.Context, arg EditPostParams) error {
 	_, err := q.db.ExecContext(ctx, editPost,
 		arg.Postid,
 		arg.Userid,
@@ -99,7 +99,7 @@ func (q *Queries) editPost(ctx context.Context, arg editPostParams) error {
 	return err
 }
 
-const getPosts = `-- name: getPosts :many
+const getPosts = `-- name: GetPosts :many
 
 SELECT postid, title, content, topic, lastmodified, isedited, upvotes, downvotes, userid FROM Posts 
 WHERE PostID = $1 and Topic = $2
@@ -108,14 +108,14 @@ OFFSET $3
 LIMIT $4
 `
 
-type getPostsParams struct {
+type GetPostsParams struct {
 	Postid uuid.UUID
 	Topic  sql.NullString
 	Offset int32
 	Limit  int32
 }
 
-func (q *Queries) getPosts(ctx context.Context, arg getPostsParams) ([]Post, error) {
+func (q *Queries) GetPosts(ctx context.Context, arg GetPostsParams) ([]Post, error) {
 	rows, err := q.db.QueryContext(ctx, getPosts,
 		arg.Postid,
 		arg.Topic,

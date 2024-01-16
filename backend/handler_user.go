@@ -30,7 +30,7 @@ func (apiCfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	// Database API
-	user, err := apiCfg.DB.createUser(r.Context(), database.createUserParams{
+	user, err := apiCfg.DB.CreateUser(r.Context(), database.CreateUserParams{
 		Userid: uuid.New(),
 		Name: params.Name,
 		Email: params.Email,
@@ -60,7 +60,7 @@ func (apiCfg *apiConfig) handlerChangePassword(w http.ResponseWriter, r *http.Re
 	}
 	// Database API
 
-	RowsAffected, err := apiCfg.DB.changePassword(r.Context(), database.changePasswordParams{
+	RowsAffected, err := apiCfg.DB.ChangePassword(r.Context(), database.ChangePasswordParams{
 		Name: params.Name,
 		Password: params.Password,
 		Password_2: params.Password_2,
@@ -91,7 +91,7 @@ func (apiCfg *apiConfig) handlerAuthenticateUser(w http.ResponseWriter, r *http.
 	}
 	// Database API
 
-	count, err := apiCfg.DB.changePassword(r.Context(), database.changePasswordParams{
+	count, err := apiCfg.DB.ChangePassword(r.Context(), database.ChangePasswordParams{
 		Name: params.Name,
 		Password: params.Password,
 	})

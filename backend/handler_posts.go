@@ -35,8 +35,8 @@ func (apiCfg *apiConfig) handlerGetPosts(w http.ResponseWriter, r *http.Request)
 		topic: topic,
 		postid: uuid.MustParse(queryParams.Get("postid")),
 	}
-	
-	posts, err := apiCfg.DB.getPosts(r.Context(), database.getPostsParams{
+
+	posts, err := apiCfg.DB.GetPosts(r.Context(), database.GetPostsParams{
 		Postid: params.postid,
 		Topic: params.topic,
 		Offset: params.offset,

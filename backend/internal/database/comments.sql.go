@@ -13,13 +13,13 @@ import (
 	"github.com/google/uuid"
 )
 
-const createComment = `-- name: createComment :one
+const createComment = `-- name: CreateComment :one
 INSERT INTO Comments (CommentID, Content, LastModified, IsEdited, Upvotes, Downvotes, UserID, PostID)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING commentid, content, lastmodified, isedited, upvotes, downvotes, userid, postid
 `
 
-type createCommentParams struct {
+type CreateCommentParams struct {
 	Commentid    uuid.UUID
 	Content      sql.NullString
 	Lastmodified time.Time
@@ -30,7 +30,7 @@ type createCommentParams struct {
 	Postid       uuid.NullUUID
 }
 
-func (q *Queries) createComment(ctx context.Context, arg createCommentParams) (Comment, error) {
+func (q *Queries) CreateComment(ctx context.Context, arg CreateCommentParams) (Comment, error) {
 	row := q.db.QueryRowContext(ctx, createComment,
 		arg.Commentid,
 		arg.Content,
@@ -55,48 +55,48 @@ func (q *Queries) createComment(ctx context.Context, arg createCommentParams) (C
 	return i, err
 }
 
-const deleteComment = `-- name: deleteComment :exec
+const deleteComment = `-- name: DeleteComment :exec
 
 UPDATE Comments
 SET Content = "Deleted"
 WHERE UserID = $2 and CommentID = $1
 `
 
-type deleteCommentParams struct {
+type DeleteCommentParams struct {
 	Commentid uuid.UUID
 	Userid    uuid.NullUUID
 }
 
-func (q *Queries) deleteComment(ctx context.Context, arg deleteCommentParams) error {
+func (q *Queries) DeleteComment(ctx context.Context, arg DeleteCommentParams) error {
 	_, err := q.db.ExecContext(ctx, deleteComment, arg.Commentid, arg.Userid)
 	return err
 }
 
-const editComment = `-- name: editComment :exec
+const editComment = `-- name: EditComment :exec
 
 UPDATE Comments
 SET Content = $3, IsEdited = true
 WHERE UserID = $2 and CommentID = $1
 `
 
-type editCommentParams struct {
+type EditCommentParams struct {
 	Commentid uuid.UUID
 	Userid    uuid.NullUUID
 	Content   sql.NullString
 }
 
-func (q *Queries) editComment(ctx context.Context, arg editCommentParams) error {
+func (q *Queries) EditComment(ctx context.Context, arg EditCommentParams) error {
 	_, err := q.db.ExecContext(ctx, editComment, arg.Commentid, arg.Userid, arg.Content)
 	return err
 }
 
-const getComments = `-- name: getComments :many
+const getComments = `-- name: GetComments :many
 
 SELECT commentid, content, lastmodified, isedited, upvotes, downvotes, userid, postid FROM Comments 
 WHERE PostID = $1
 `
 
-func (q *Queries) getComments(ctx context.Context, postid uuid.NullUUID) ([]Comment, error) {
+func (q *Queries) GetComments(ctx context.Context, postid uuid.NullUUID) ([]Comment, error) {
 	rows, err := q.db.QueryContext(ctx, getComments, postid)
 	if err != nil {
 		return nil, err
