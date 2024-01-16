@@ -38,6 +38,7 @@ func main(){
 
 	log.Printf("Connected to Database")
 	dbQueries := database.New(conn)
+	
 	apiCfg := apiConfig{
 		DB: dbQueries,
 	}
