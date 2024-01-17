@@ -10,6 +10,7 @@ import RootLayout from "./components/RootLayout"
 import LoginPage from "./components/LoginPage"
 import ResetPassword from "./components/ResetPassword"
 import SignupPage from "./components/SignupPage"
+import CreatePost from "./components/CreatePost"
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -24,6 +25,7 @@ const router = createBrowserRouter(
         <Route path="social" element={<PostsList topic="social"/>}/>
         <Route path="others" element={<PostsList topic="others"/>}/>
       </Route>
+      <Route path="createpost" element={<CreatePost />}/>
       <Route path="login" element={<LoginPage />}/>
       <Route path="resetpassword" element={<ResetPassword />}/>
       <Route path="signup" element={<SignupPage />}/>

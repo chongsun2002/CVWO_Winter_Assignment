@@ -1,10 +1,10 @@
-import * as React from 'react'
-import { Outlet } from 'react-router-dom'
+import * as React from 'react';
+import { Outlet } from 'react-router-dom';
 
-import { Grid, GridItem } from '@chakra-ui/react'
+import { Grid, GridItem } from '@chakra-ui/react';
 
-import NavBar from './NavBar'
-import SideBar from './SideBar'
+import NavBar from './NavBar';
+import SideBar from './SideBar';
 
 const RootLayout: React.FC = () => {
     return (
@@ -25,6 +25,6 @@ const RootLayout: React.FC = () => {
             </GridItem>
         </Grid>
     )
-}
+};
 
 export default RootLayout

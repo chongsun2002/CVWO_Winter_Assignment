@@ -1,19 +1,19 @@
-import * as React from "react"
+import * as React from "react";
 
-import { Container, InputGroup, Input, InputLeftElement, InputRightElement, useBoolean, Button, Stack, Center } from "@chakra-ui/react"
-import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons"
-import { Link as ChakraLink } from "@chakra-ui/react"
-import { Link as ReactRouterLink } from "react-router-dom"
+import { Container, InputGroup, Input, InputLeftElement, InputRightElement, useBoolean, Button, Stack, Center } from "@chakra-ui/react";
+import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+import { Link as ChakraLink } from "@chakra-ui/react";
+import { Link as ReactRouterLink } from "react-router-dom";
 
 interface PasswordInputProps {
     placeholder: string;
 }
 
 const PasswordInput: React.FC<PasswordInputProps> = ({ placeholder }) => {
-    const [show, setShow] = useBoolean(false)
+    const [show, setShow] = useBoolean(false);
     const handleClick: () => void = () => {
-        setShow.toggle()
-    }
+        setShow.toggle();
+    };
 
     return (
         <InputGroup>
@@ -29,7 +29,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({ placeholder }) => {
             </InputRightElement>
         </InputGroup>
     )
-}
+};
 
 const SignupPage = () => {
     return (
@@ -50,6 +50,6 @@ const SignupPage = () => {
             </Center>
         </Container>
     )
-}
+};
 
-export default SignupPage
+export default SignupPage;

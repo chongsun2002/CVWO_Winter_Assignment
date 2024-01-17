@@ -1,7 +1,8 @@
-import * as React from "react"
-import { Flex, Heading, Spacer, Input, InputGroup, InputLeftElement, Button, ButtonGroup, Box, LinkBox, LinkOverlay, Image, HStack } from "@chakra-ui/react"
-import { SearchIcon } from "@chakra-ui/icons"
-import { Link as ReactRouterLink } from "react-router-dom"
+import * as React from "react";
+import { Flex, Heading, Spacer, Input, InputGroup, InputLeftElement,
+         Button, ButtonGroup, Box, LinkBox, LinkOverlay, Image, HStack } from "@chakra-ui/react";
+import { SearchIcon } from "@chakra-ui/icons";
+import { Link as ReactRouterLink } from "react-router-dom";
 
 const NavBar: React.FC = () => {
     return (
@@ -34,6 +35,6 @@ const NavBar: React.FC = () => {
             </ButtonGroup>
         </Flex>
     )
-}
+};
 
-export default NavBar
+export default NavBar;

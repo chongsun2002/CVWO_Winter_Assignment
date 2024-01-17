@@ -1,8 +1,8 @@
-import * as React from 'react'
-import { Link as ReactRouterLink } from 'react-router-dom'
+import * as React from 'react';
+import { Link as ReactRouterLink } from 'react-router-dom';
 
-import { Container, Heading, List, ListItem } from '@chakra-ui/react'
-import { Link as ChakraLink } from '@chakra-ui/react'
+import { Container, Heading, List, ListItem } from '@chakra-ui/react';
+import { Link as ChakraLink } from '@chakra-ui/react';
 
 const SideBar: React.FC = () => {
     return (
@@ -32,6 +32,6 @@ const SideBar: React.FC = () => {
             </List>
         </Container>
     )
-}
+};
 
-export default SideBar
+export default SideBar;

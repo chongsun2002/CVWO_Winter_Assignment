@@ -1,7 +1,7 @@
-import * as React from "react"
+import * as React from "react";
 
-import { Container, Heading, Text, Flex, Button, Spacer, ButtonGroup } from "@chakra-ui/react"
-import { ChatIcon, ArrowUpIcon, ArrowDownIcon } from "@chakra-ui/icons"
+import { Container, Heading, Text, Flex, Button, Spacer, ButtonGroup } from "@chakra-ui/react";
+import { ChatIcon, ArrowUpIcon, ArrowDownIcon } from "@chakra-ui/icons";
 
 interface PostHeaderProps {
     title: string;
@@ -12,7 +12,7 @@ interface PostHeaderProps {
     upvotes: Number;
     downvotes: Number;
     username: string;
-}
+};
 
 const PostHeader: React.FC<PostHeaderProps> = ({title, content, topic, lastmodified, isedited, upvotes, downvotes, username}) => {
     return (
@@ -36,6 +36,6 @@ const PostHeader: React.FC<PostHeaderProps> = ({title, content, topic, lastmodif
             </Flex>
         </Container>
     )
-}
+};
 
-export default PostHeader
+export default PostHeader;

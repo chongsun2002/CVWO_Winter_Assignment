@@ -1,6 +1,6 @@
-import * as React from "react"
+import * as React from "react";
 
-import { Container, Center } from "@chakra-ui/react"
+import { Container, Center } from "@chakra-ui/react";
 
 
 const ResetPassword: React.FC = () => {
@@ -9,6 +9,6 @@ const ResetPassword: React.FC = () => {
             <Center>Sorry! The page you have clicked on is still under development!</Center>
         </Container>
     )
-}
+};
 
-export default ResetPassword
+export default ResetPassword;

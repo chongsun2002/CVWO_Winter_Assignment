@@ -1,8 +1,8 @@
-import * as React from "react"
+import * as React from "react";
 
-import { Container } from "@chakra-ui/react"
+import { Container } from "@chakra-ui/react";
 
-import PostHeader from "./PostHeader"
+import PostHeader from "./PostHeader";
 
 interface PostProps {
     title: string;
@@ -13,7 +13,7 @@ interface PostProps {
     upvotes: Number;
     downvotes: Number;
     username: string;
-}
+};
 
 
 
@@ -23,6 +23,6 @@ const Post: React.FC<PostProps> = ({title, content, topic, lastmodified, isedite
             <PostHeader title={title} content={content} topic={topic} lastmodified={lastmodified} isedited={isedited} upvotes={upvotes} downvotes={downvotes} username={username}/>
         </Container>
     )
-}
+};
 
-export default Post
+export default Post;
