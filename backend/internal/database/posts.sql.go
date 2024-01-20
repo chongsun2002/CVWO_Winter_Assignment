@@ -99,48 +99,93 @@ func (q *Queries) EditPost(ctx context.Context, arg EditPostParams) error {
 	return err
 }
 
-const getPosts = `-- name: GetPosts :many
+const getPostByID = `-- name: GetPostByID :one
 
 SELECT postid, title, content, topic, lastmodified, isedited, upvotes, downvotes, userid FROM Posts 
-WHERE PostID = $1 and Topic = $2
-ORDER BY PostID
-OFFSET $3
-LIMIT $4
+WHERE PostID = $1
+`
+
+func (q *Queries) GetPostByID(ctx context.Context, postid uuid.UUID) (Post, error) {
+	row := q.db.QueryRowContext(ctx, getPostByID, postid)
+	var i Post
+	err := row.Scan(
+		&i.Postid,
+		&i.Title,
+		&i.Content,
+		&i.Topic,
+		&i.Lastmodified,
+		&i.Isedited,
+		&i.Upvotes,
+		&i.Downvotes,
+		&i.Userid,
+	)
+	return i, err
+}
+
+const getPosts = `-- name: GetPosts :many
+
+SELECT postid, title, content, topic, lastmodified, isedited, upvotes, downvotes, userid FROM Posts
+WHERE (Topic = $1 OR $1 IS NULL)
+OFFSET $2
+LIMIT $3
 `
 
 type GetPostsParams struct {
-	Postid uuid.UUID
 	Topic  sql.NullString
 	Offset int32
 	Limit  int32
 }
 
-func (q *Queries) GetPosts(ctx context.Context, arg GetPostsParams) ([]Post, error) {
-	rows, err := q.db.QueryContext(ctx, getPosts,
-		arg.Postid,
-		arg.Topic,
-		arg.Offset,
-		arg.Limit,
-	)
+type PostNotNull struct {
+	Postid       uuid.UUID
+	Title        string
+	Content      string
+	Topic        string
+	Lastmodified time.Time
+	Isedited     bool
+	Upvotes      int32
+	Downvotes    int32
+	Userid       uuid.UUID
+}
+
+func (q *Queries) GetPosts(ctx context.Context, arg GetPostsParams) ([]PostNotNull, error) {
+	rows, err := q.db.QueryContext(ctx, getPosts, arg.Topic, arg.Offset, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Post
+	var items []PostNotNull
 	for rows.Next() {
-		var i Post
+		var i PostNotNull
+		var content, topic sql.NullString
+		var user uuid.NullUUID
 		if err := rows.Scan(
 			&i.Postid,
 			&i.Title,
-			&i.Content,
-			&i.Topic,
+			&content,
+			&topic,
 			&i.Lastmodified,
 			&i.Isedited,
 			&i.Upvotes,
 			&i.Downvotes,
-			&i.Userid,
+			&user,
 		); err != nil {
 			return nil, err
+		}
+		if content.Valid == true {
+			i.Content = content.String
+		} else {
+			i.Content = ""
+		}
+		if topic.Valid == true {
+			i.Topic = topic.String
+		} else {
+			i.Topic = ""
+		}
+		if user.Valid == true {
+			i.Userid = user.UUID
+		} else {
+			i.Userid = uuid.UUID{}
 		}
 		items = append(items, i)
 	}

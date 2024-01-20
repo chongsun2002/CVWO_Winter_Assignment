@@ -7,39 +7,59 @@ import ("net/http"
 		"database/sql"
 		"encoding/json"
 		"time"
+		"github.com/go-chi/chi/v5"
 
 		"github.com/google/uuid"
 )
 
-func (apiCfg *apiConfig) handlerGetPosts(w http.ResponseWriter, r *http.Request) {
+func (apiCfg *apiConfig) handlerGetPostByID(w http.ResponseWriter, r *http.Request) {
+	type parameters struct {
+		postid uuid.UUID
+	}
+	postid, err := uuid.Parse(chi.URLParam(r, "id"))
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid PostID")
+		return
+	}
+	params := parameters{
+		postid: postid,
+	}
+
+	post, err := apiCfg.DB.GetPostByID(r.Context(), params.postid)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Unable to get post: %v", err))
+		return
+	}
+	respondWithJSON(w, http.StatusOK, post)
+}
+
+func (apiCfg *apiConfig) handlerGetPostsList(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
 		offset int32
 		count int32
 		topic sql.NullString
-		postid uuid.UUID
 	}
 	queryParams := r.URL.Query()
 	offset, err := strconv.Atoi(queryParams.Get("offset"))
 	if err != nil {
-		panic(err)
+		respondWithError(w, http.StatusBadRequest, "Invalid offset")
+		return
 	}
 	count, err := strconv.Atoi(queryParams.Get("count"))
 	if err != nil {
-		panic(err)
+		respondWithError(w, http.StatusBadRequest, "Invalid count")
+		return
 	}
 	topic := sql.NullString{String: queryParams.Get("topic"), Valid: true}
 	if topic.String=="all" {
-		topic = sql.NullString{String: "", Valid: false}
+		topic = sql.NullString{Valid: false}
 	}
 	params := parameters{
 		offset: int32(offset),
 		count: int32(count),
 		topic: topic,
-		postid: uuid.MustParse(queryParams.Get("postid")),
 	}
-
 	posts, err := apiCfg.DB.GetPosts(r.Context(), database.GetPostsParams{
-		Postid: params.postid,
 		Topic: params.topic,
 		Offset: params.offset,
 		Limit:  params.count,
@@ -85,6 +105,8 @@ func (apiCfg *apiConfig) handlerCreatePost(w http.ResponseWriter, r *http.Reques
 	})
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, fmt.Sprintf("Couldn't create post, error at Database API: %v", err))
+		return
 	}
 	respondWithJSON(w, http.StatusCreated, post)
 }
+

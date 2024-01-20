@@ -3,7 +3,7 @@ import {
   ChakraProvider,
   theme,
 } from "@chakra-ui/react"
-import { createBrowserRouter, BrowserRouterProps, createRoutesFromElements, Route, RouterProvider } from "react-router-dom"
+import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from "react-router-dom"
 
 import PostsList from "./components/PostsList"
 import RootLayout from "./components/RootLayout"

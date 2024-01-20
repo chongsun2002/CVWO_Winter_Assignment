@@ -1,3 +1,65 @@
 ejd45*L4k@3&cAbB
 abc
 PORT: 5432
+
+
+// handle sql nullstring  and uuid null uuid
+type GetPostsParams struct {
+	Topic  sql.NullString
+	Offset int32
+	Limit  int32
+}
+
+type PostNotNull struct {
+	Postid       uuid.UUID
+	Title        string
+	Content      string
+	Topic        string
+	Lastmodified time.Time
+	Isedited     bool
+	Upvotes      int32
+	Downvotes    int32
+	Userid       uuid.UUID
+}
+
+func (q *Queries) GetPosts(ctx context.Context, arg GetPostsParams) ([]PostNotNull, error) {
+	rows, err := q.db.QueryContext(ctx, getPosts, arg.Topic, arg.Offset, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []PostNotNull
+	for rows.Next() {
+		var i PostNotNull
+		var content, topic sql.NullString
+		var user uuid.NullUUID
+		if err := rows.Scan(
+			&i.Postid,
+			&i.Title,
+			&content,
+			&topic,
+			&i.Lastmodified,
+			&i.Isedited,
+			&i.Upvotes,
+			&i.Downvotes,
+			&user,
+		); err != nil {
+			return nil, err
+		}
+		if content.Valid == true {
+			i.Content = content.String
+		} else {
+			i.Content = ""
+		}
+		if topic.Valid == true {
+			i.Topic = topic.String
+		} else {
+			i.Topic = ""
+		}
+		if user.Valid == true {
+			i.Userid = user.UUID
+		} else {
+			i.Userid = uuid.UUID{}
+		}
+		items = append(items, i)
+	}

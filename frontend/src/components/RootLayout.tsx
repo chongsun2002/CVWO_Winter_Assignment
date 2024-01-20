@@ -12,7 +12,7 @@ const RootLayout: React.FC = () => {
             templateAreas={`'nav nav'
                             'side main'`}
             gridTemplateRows={'100px'}
-            gridTemplateColumns={'1fr 4fr'}
+            gridTemplateColumns={'1fr 5fr'}
         >
             <GridItem area={'nav'}>
                 <NavBar />

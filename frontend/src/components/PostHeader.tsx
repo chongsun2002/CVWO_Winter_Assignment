@@ -7,7 +7,7 @@ interface PostHeaderProps {
     title: string;
     content: string;
     topic: string;
-    lastmodified: Date;
+    lastmodified: string;
     isedited: Boolean;
     upvotes: Number;
     downvotes: Number;

@@ -1,10 +1,14 @@
 package main
 
-import ("net/http"
-		"encoding/json"
-		"log")
+import (
+	"encoding/json"
+	"log"
+	"net/http"
+)
 
 // This file converts payloads into JSON and errors into JSON
+
+
 
 func respondWithJSON(w http.ResponseWriter, statusCode int, payload interface{}) {
 	data, err := json.Marshal(payload)

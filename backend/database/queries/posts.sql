@@ -16,10 +16,14 @@ SET Content = "Deleted"
 WHERE UserID = $2 and PostID = $1;
 --
 
--- name: GetPosts :many
+-- name: GetPostByID :one
 SELECT * FROM Posts 
-WHERE PostID = $1 and Topic = $2
-ORDER BY PostID
-OFFSET $3
-LIMIT $4;
+WHERE PostID = $1;
+--
+
+-- name: GetPosts :many
+SELECT * FROM Posts
+WHERE (Topic = $1 OR $1 IS NULL)
+OFFSET $2
+LIMIT $3;
 --

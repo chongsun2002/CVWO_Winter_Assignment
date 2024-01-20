@@ -1,16 +1,20 @@
 import * as React from 'react';
 import { Link as ReactRouterLink } from 'react-router-dom';
 
-import { Container, Heading, List, ListItem } from '@chakra-ui/react';
+import { Container, Heading, List, ListItem, Button } from '@chakra-ui/react';
 import { Link as ChakraLink } from '@chakra-ui/react';
+import { AddIcon } from '@chakra-ui/icons'
 
 const SideBar: React.FC = () => {
     return (
         <Container borderRight='1px' borderRightColor='gray.200' p='8' h='calc(100vh - 100px)'>
-            <Heading size='sm' ml='2.5vw'>
+            <Button leftIcon={<AddIcon />} colorScheme='pink' mb='5'>
+                <ReactRouterLink to="/createpost">Create Post</ReactRouterLink>
+            </Button>
+            <Heading size='sm'>
                 Topics
             </Heading>
-            <List spacing='3' mt='5' ml='2.5vw'>
+            <List spacing='3' mt='5'>
                 <ListItem>
                     <ChakraLink as={ReactRouterLink} to='/posts/academics'>Academics</ChakraLink>
                 </ListItem>
