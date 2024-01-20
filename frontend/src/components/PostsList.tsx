@@ -34,12 +34,17 @@ const PostsList: React.FC<PostsListProps> = ({topic}) => {
         const scrollTop = document.documentElement.scrollTop
         const scrollHeight = document.documentElement.scrollHeight
         const clientHeight = document.documentElement.clientHeight
-        if (scrollTop + clientHeight >= scrollHeight) {
-            setPage(page + 1)
+        if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight) {
+            fetchPosts(page);
+            setPage(page + 1);
         }
     }
 
-    window.onscroll = 
+    React.useEffect(() => {
+        window.addEventListener('scroll', onScroll)
+        return () => window.removeEventListener('scroll', onScroll)
+      }, [posts])
+
     return (
         <Container h='calc(100vh - 100px)' maxWidth='100%' overflow='auto'>
             <ul>
