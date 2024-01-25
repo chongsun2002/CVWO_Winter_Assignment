@@ -55,10 +55,10 @@ func (q *Queries) CreateComment(ctx context.Context, arg CreateCommentParams) (C
 	return i, err
 }
 
-const deleteComment = `-- name: DeleteComment :exec
+const deleteComment = `-- name: DeleteComment :execrows
 
 UPDATE Comments
-SET Content = "Deleted"
+SET Content = 'Deleted'
 WHERE UserID = $2 and CommentID = $1
 `
 
@@ -67,12 +67,15 @@ type DeleteCommentParams struct {
 	Userid    uuid.NullUUID
 }
 
-func (q *Queries) DeleteComment(ctx context.Context, arg DeleteCommentParams) error {
-	_, err := q.db.ExecContext(ctx, deleteComment, arg.Commentid, arg.Userid)
-	return err
+func (q *Queries) DeleteComment(ctx context.Context, arg DeleteCommentParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, deleteComment, arg.Commentid, arg.Userid)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
 }
 
-const editComment = `-- name: EditComment :exec
+const editComment = `-- name: EditComment :execrows
 
 UPDATE Comments
 SET Content = $3, IsEdited = true
@@ -85,9 +88,12 @@ type EditCommentParams struct {
 	Content   sql.NullString
 }
 
-func (q *Queries) EditComment(ctx context.Context, arg EditCommentParams) error {
-	_, err := q.db.ExecContext(ctx, editComment, arg.Commentid, arg.Userid, arg.Content)
-	return err
+func (q *Queries) EditComment(ctx context.Context, arg EditCommentParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, editComment, arg.Commentid, arg.Userid, arg.Content)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
 }
 
 const getComments = `-- name: GetComments :many

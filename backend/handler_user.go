@@ -79,7 +79,7 @@ func (apiCfg *apiConfig) handlerChangePassword(w http.ResponseWriter, r *http.Re
 func (apiCfg *apiConfig) handlerAuthenticateUser(w http.ResponseWriter, r *http.Request){
 	type parameters struct {
 		Name string
-		Password string // The old password
+		Password string
 	}
 	// Decode JSON
 	decoder := json.NewDecoder(r.Body)
@@ -90,18 +90,17 @@ func (apiCfg *apiConfig) handlerAuthenticateUser(w http.ResponseWriter, r *http.
 		return
 	}
 	// Database API
-
-	count, err := apiCfg.DB.ChangePassword(r.Context(), database.ChangePasswordParams{
+	user, err := apiCfg.DB.AuthenticateUser(r.Context(), database.AuthenticateUserParams{
 		Name: params.Name,
 		Password: params.Password,
 	})
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, fmt.Sprintf("Couldn't change password, error at Database API: %v", err))
+		respondWithError(w, http.StatusBadRequest, fmt.Sprintf("Couldn't login, error at Database API: %v", err))
 		return
 	}
-	if count == 0 {
-		respondWithJSON(w, http.StatusOK, struct{PasswordChanged string}{PasswordChanged: "Unsucessful login, wrong Username or Password"})
+	if user.Userid == uuid.Nil {
+		respondWithJSON(w, http.StatusOK, "")
 		return
 	}
-	respondWithJSON(w, http.StatusOK, struct{PasswordChanged string}{PasswordChanged: "Successfully Login"})
+	respondWithJSON(w, http.StatusOK, user)
 }

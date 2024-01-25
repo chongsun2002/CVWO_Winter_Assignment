@@ -14,7 +14,7 @@ import (
 
 const authenticateUser = `-- name: AuthenticateUser :one
 
-SELECT count(*) FROM Users
+SELECT UserID, Name FROM Users
 WHERE Name = $1 AND Password = $2
 `
 
@@ -23,11 +23,16 @@ type AuthenticateUserParams struct {
 	Password string
 }
 
-func (q *Queries) AuthenticateUser(ctx context.Context, arg AuthenticateUserParams) (int64, error) {
+type AuthenticateUserRow struct {
+	Userid uuid.UUID
+	Name   string
+}
+
+func (q *Queries) AuthenticateUser(ctx context.Context, arg AuthenticateUserParams) (AuthenticateUserRow, error) {
 	row := q.db.QueryRowContext(ctx, authenticateUser, arg.Name, arg.Password)
-	var count int64
-	err := row.Scan(&count)
-	return count, err
+	var i AuthenticateUserRow
+	err := row.Scan(&i.Userid, &i.Name)
+	return i, err
 }
 
 const changePassword = `-- name: ChangePassword :execrows
@@ -54,7 +59,7 @@ func (q *Queries) ChangePassword(ctx context.Context, arg ChangePasswordParams) 
 const createUser = `-- name: CreateUser :one
 INSERT INTO Users (UserID, Name, Email, LastModified, Password)
 VALUES ($1, $2, $3, $4, $5)
-RETURNING userid, name, email, lastmodified, password
+RETURNING UserID, Name
 `
 
 type CreateUserParams struct {
@@ -65,7 +70,12 @@ type CreateUserParams struct {
 	Password     string
 }
 
-func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
+type CreateUserRow struct {
+	Userid uuid.UUID
+	Name   string
+}
+
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (CreateUserRow, error) {
 	row := q.db.QueryRowContext(ctx, createUser,
 		arg.Userid,
 		arg.Name,
@@ -73,13 +83,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		arg.Lastmodified,
 		arg.Password,
 	)
-	var i User
-	err := row.Scan(
-		&i.Userid,
-		&i.Name,
-		&i.Email,
-		&i.Lastmodified,
-		&i.Password,
-	)
+	var i CreateUserRow
+	err := row.Scan(&i.Userid, &i.Name)
 	return i, err
 }

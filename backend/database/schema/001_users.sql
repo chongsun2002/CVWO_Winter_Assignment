@@ -1,10 +1,10 @@
 -- +goose Up
 CREATE TABLE Users (
     UserID UUID PRIMARY KEY,
-    Name TEXT NOT NULL,
-    Email CITEXT NOT NULL, 
+    Name TEXT UNIQUE NOT NULL,
+    Email CITEXT UNIQUE NOT NULL, 
     LastModified TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    Password VARCHAR(30) NOT NULL
+    Password VARCHAR(60) NOT NULL
 );
 
 -- +goose Down

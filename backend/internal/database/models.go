@@ -32,6 +32,7 @@ type Post struct {
 	Upvotes      int32
 	Downvotes    int32
 	Userid       uuid.NullUUID
+	Name         sql.NullString
 }
 
 type User struct {

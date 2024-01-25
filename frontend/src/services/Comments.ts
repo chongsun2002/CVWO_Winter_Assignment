@@ -1,5 +1,3 @@
-class CommentsDataService {
+import http from './AxiosAPI'
+import { AxiosResponse } from 'axios'
 
-}
-
-export default CommentsDataService

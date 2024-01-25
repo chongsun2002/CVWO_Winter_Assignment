@@ -14,9 +14,9 @@ import (
 )
 
 const createPost = `-- name: CreatePost :one
-INSERT INTO Posts (PostID, Title, Content, Topic, LastModified, IsEdited, Upvotes, Downvotes, UserID)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-RETURNING postid, title, content, topic, lastmodified, isedited, upvotes, downvotes, userid
+INSERT INTO Posts (PostID, Title, Content, Topic, LastModified, IsEdited, Upvotes, Downvotes, UserID, Name)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+RETURNING postid, title, content, topic, lastmodified, isedited, upvotes, downvotes, userid, name
 `
 
 type CreatePostParams struct {
@@ -29,6 +29,7 @@ type CreatePostParams struct {
 	Upvotes      int32
 	Downvotes    int32
 	Userid       uuid.NullUUID
+	Name         sql.NullString
 }
 
 func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, error) {
@@ -42,6 +43,7 @@ func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, e
 		arg.Upvotes,
 		arg.Downvotes,
 		arg.Userid,
+		arg.Name,
 	)
 	var i Post
 	err := row.Scan(
@@ -54,14 +56,15 @@ func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, e
 		&i.Upvotes,
 		&i.Downvotes,
 		&i.Userid,
+		&i.Name,
 	)
 	return i, err
 }
 
-const deletePost = `-- name: DeletePost :exec
+const deletePost = `-- name: DeletePost :execrows
 
 UPDATE Posts
-SET Content = "Deleted"
+SET Content = 'Deleted'
 WHERE UserID = $2 and PostID = $1
 `
 
@@ -70,12 +73,15 @@ type DeletePostParams struct {
 	Userid uuid.NullUUID
 }
 
-func (q *Queries) DeletePost(ctx context.Context, arg DeletePostParams) error {
-	_, err := q.db.ExecContext(ctx, deletePost, arg.Postid, arg.Userid)
-	return err
+func (q *Queries) DeletePost(ctx context.Context, arg DeletePostParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, deletePost, arg.Postid, arg.Userid)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
 }
 
-const editPost = `-- name: EditPost :exec
+const editPost = `-- name: EditPost :execrows
 
 UPDATE Posts
 SET Content = $3, IsEdited = true, LastModified=$4
@@ -89,51 +95,17 @@ type EditPostParams struct {
 	Lastmodified time.Time
 }
 
-func (q *Queries) EditPost(ctx context.Context, arg EditPostParams) error {
-	_, err := q.db.ExecContext(ctx, editPost,
+func (q *Queries) EditPost(ctx context.Context, arg EditPostParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, editPost,
 		arg.Postid,
 		arg.Userid,
 		arg.Content,
 		arg.Lastmodified,
 	)
-	return err
-}
-
-const getPostByID = `-- name: GetPostByID :one
-
-SELECT postid, title, content, topic, lastmodified, isedited, upvotes, downvotes, userid FROM Posts 
-WHERE PostID = $1
-`
-
-func (q *Queries) GetPostByID(ctx context.Context, postid uuid.UUID) (Post, error) {
-	row := q.db.QueryRowContext(ctx, getPostByID, postid)
-	var i Post
-	err := row.Scan(
-		&i.Postid,
-		&i.Title,
-		&i.Content,
-		&i.Topic,
-		&i.Lastmodified,
-		&i.Isedited,
-		&i.Upvotes,
-		&i.Downvotes,
-		&i.Userid,
-	)
-	return i, err
-}
-
-const getPosts = `-- name: GetPosts :many
-
-SELECT postid, title, content, topic, lastmodified, isedited, upvotes, downvotes, userid FROM Posts
-WHERE (Topic = $1 OR $1 IS NULL)
-OFFSET $2
-LIMIT $3
-`
-
-type GetPostsParams struct {
-	Topic  sql.NullString
-	Offset int32
-	Limit  int32
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
 }
 
 type PostNotNull struct {
@@ -146,6 +118,69 @@ type PostNotNull struct {
 	Upvotes      int32
 	Downvotes    int32
 	Userid       uuid.UUID
+	Name         string 
+}
+
+
+const getPostByID = `-- name: GetPostByID :one
+
+SELECT postid, title, content, topic, lastmodified, isedited, upvotes, downvotes, userid, name FROM Posts 
+WHERE PostID = $1
+`
+
+func (q *Queries) GetPostByID(ctx context.Context, postid uuid.UUID) (PostNotNull, error) {
+	row := q.db.QueryRowContext(ctx, getPostByID, postid)
+	var i PostNotNull
+	var content, topic, name sql.NullString
+	var user uuid.NullUUID
+	err := row.Scan(
+		&i.Postid,
+		&i.Title,
+		&content,
+		&topic,
+		&i.Lastmodified,
+		&i.Isedited,
+		&i.Upvotes,
+		&i.Downvotes,
+		&user,
+		&name,
+	)
+	if content.Valid == true {
+		i.Content = content.String
+	} else {
+		i.Content = ""
+	}
+	if topic.Valid == true {
+		i.Topic = topic.String
+	} else {
+		i.Topic = ""
+	}
+	if name.Valid == true {
+		i.Name = name.String
+	} else {
+		i.Name = ""
+	}
+	if user.Valid == true {
+		i.Userid = user.UUID
+	} else {
+		i.Userid = uuid.UUID{}
+	}
+	return i, err
+}
+
+const getPosts = `-- name: GetPosts :many
+
+SELECT postid, title, content, topic, lastmodified, isedited, upvotes, downvotes, userid, name FROM Posts
+WHERE (Topic = $1 OR $1 IS NULL)
+OFFSET $2
+LIMIT $3
+`
+
+
+type GetPostsParams struct {
+	Topic  sql.NullString
+	Offset int32
+	Limit  int32
 }
 
 func (q *Queries) GetPosts(ctx context.Context, arg GetPostsParams) ([]PostNotNull, error) {
@@ -157,7 +192,7 @@ func (q *Queries) GetPosts(ctx context.Context, arg GetPostsParams) ([]PostNotNu
 	var items []PostNotNull
 	for rows.Next() {
 		var i PostNotNull
-		var content, topic sql.NullString
+		var content, topic, name sql.NullString
 		var user uuid.NullUUID
 		if err := rows.Scan(
 			&i.Postid,
@@ -169,6 +204,7 @@ func (q *Queries) GetPosts(ctx context.Context, arg GetPostsParams) ([]PostNotNu
 			&i.Upvotes,
 			&i.Downvotes,
 			&user,
+			&name,
 		); err != nil {
 			return nil, err
 		}
@@ -181,6 +217,11 @@ func (q *Queries) GetPosts(ctx context.Context, arg GetPostsParams) ([]PostNotNu
 			i.Topic = topic.String
 		} else {
 			i.Topic = ""
+		}
+		if name.Valid == true {
+			i.Name = name.String
+		} else {
+			i.Name = ""
 		}
 		if user.Valid == true {
 			i.Userid = user.UUID

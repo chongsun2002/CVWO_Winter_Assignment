@@ -3,16 +3,22 @@ import { useState } from "react";
 
 import { Container, Input, Text, Textarea, Select, Button } from "@chakra-ui/react";
 
-import { user } from "../services/Authentication"
+import { useAuth } from "./Auth"
 import { createPost, Post } from "../services/Posts"
 import { useNavigate } from "react-router-dom";
 
-interface PostsListProps {
 
-}
+const CreatePost: React.FC = () => {
+    //Redirect user to login page if null
+    const { user } = useAuth();
+    const navigate = useNavigate();
+    React.useEffect(() => {
+        if (!user) {
+            navigate('/login')
+        }
+    }, [user, navigate]);
 
-const CreatePost: React.FC<PostsListProps> = () => {
-    const emptyPost: Post = {PostID: "", Title: "", Content: "", Topic: "", Lastmodified: "", Isedited: false, Upvotes: 0, Downvotes: 0, UserID: user.Userid};
+    const emptyPost: Post = {Postid: "", Title: "", Content: "", Topic: "", Lastmodified: "", Isedited: false, Upvotes: 0, Downvotes: 0, Userid: user?.Userid ?? "", Name: user?.Name ?? ""};
     const [post, setPost] = useState<Post>(emptyPost);
 
     const onChangeTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -33,32 +39,37 @@ const CreatePost: React.FC<PostsListProps> = () => {
         setPost(updatedpost);
     }
 
-    const navigate = useNavigate();
     const navigateHome = (): void => {
         navigate("/")
     }
 
-    const submitPost = (e: React.MouseEvent<HTMLButtonElement>): void => {
+    const submitPost = async (e: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
         const isTitleError = post.Title === ""
         const isContentError = post.Content === ""
         const isTopicError = post.Topic ===  ""
 
         if (isTitleError) {
-            console.log("No Title!")
+            console.error("No Title!")
             return
         }
         if (isContentError) {
-            console.log("No Content!")
+            console.error("No Content!")
             return
         }
         if (isTopicError) {
-            console.log("No Topic!")
+            console.error("No Topic!")
             return
         }
-        const response: Promise<Post[]> = createPost(post);
-        console.log(response)
-        setPost(emptyPost);
-        navigateHome();
+        let response: Post[]
+        try {
+            response = await createPost(post);
+            setPost(emptyPost);
+            navigateHome();
+        }
+        catch {
+            // Should settle auth here
+            console.error('Unable to create post')
+        }
     }
 
     return (
@@ -75,7 +86,7 @@ const CreatePost: React.FC<PostsListProps> = () => {
                 <option value='social'>Social</option>
                 <option value='others'>Others</option>
             </Select>
-            <Button float='right' mt='5' onClick={submitPost}>Post</Button>
+            <Button mt='5' onClick={submitPost}>Post</Button>
         </Container>
     )
 };
