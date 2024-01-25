@@ -1,7 +1,7 @@
 import * as React from "react";
 
-import { Container, Heading, Text, Flex, Button, Spacer, ButtonGroup, LinkOverlay, LinkBox } from "@chakra-ui/react";
-import { ChatIcon, ArrowUpIcon, ArrowDownIcon } from "@chakra-ui/icons";
+import { Container, Heading, Text, Flex, Button, LinkOverlay, LinkBox } from "@chakra-ui/react";
+import { ChatIcon } from "@chakra-ui/icons";
 import { Link as ReactRouterLink } from "react-router-dom"
 import { topicFormat } from "./Utility";
 
@@ -38,15 +38,6 @@ const PostHeader: React.FC<PostHeaderProps> = ({postid, title, content, topic, l
                 <Button aria-label='Comment' leftIcon={<ChatIcon />}>
                     <ReactRouterLink to={"/posts/" + postid}>Comment</ReactRouterLink>
                 </Button>
-                <Spacer/>
-                <ButtonGroup verticalAlign='baseline'>
-                    <Button aria-label='Upvote' rightIcon={<ArrowUpIcon/>} w='130px'>
-                        {upvotes.toString()} Upvotes
-                    </Button>
-                    <Button aria-label='Downvote' leftIcon={<ArrowDownIcon/>} w='130px'>
-                        {downvotes.toString()} Downvotes
-                    </Button>
-                </ButtonGroup>
             </Flex>
         </Container>
     )
