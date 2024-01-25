@@ -11,7 +11,7 @@ To run the backend:
 8. that should start the backend server on port 8000
 
 To run the frontend (was built using create-react-app and CHAKRA UI):
-npm install
-npm start
-this should start the frontend on localhost:3000
+1. npm install
+2. npm start
+3. this should start the frontend on port 3000
 
