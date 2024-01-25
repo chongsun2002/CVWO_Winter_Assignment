@@ -66,9 +66,10 @@ const CreatePost: React.FC = () => {
             setPost(emptyPost);
             navigateHome();
         }
-        catch {
+        catch(error) {
             // Should settle auth here
             console.error('Unable to create post')
+            throw error
         }
     }
 

@@ -174,7 +174,7 @@ func (apiCfg *apiConfig) handlerDeletePost(w http.ResponseWriter, r *http.Reques
 	if params.Userid == "" {
 		userid.Valid = false
 	}
-	rowsChanged, err := apiCfg.DB.EditPost(r.Context(), database.EditPostParams{
+	rowsChanged, err := apiCfg.DB.DeletePost(r.Context(), database.DeletePostParams{
 		Postid: postid,
 		Userid: userid,
 	})

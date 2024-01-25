@@ -14,9 +14,9 @@ import (
 )
 
 const createComment = `-- name: CreateComment :one
-INSERT INTO Comments (CommentID, Content, LastModified, IsEdited, Upvotes, Downvotes, UserID, PostID)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-RETURNING commentid, content, lastmodified, isedited, upvotes, downvotes, userid, postid
+INSERT INTO Comments (CommentID, Content, LastModified, IsEdited, Upvotes, Downvotes, UserID, PostID, Name)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+RETURNING commentid, content, lastmodified, isedited, upvotes, downvotes, userid, postid, name
 `
 
 type CreateCommentParams struct {
@@ -28,6 +28,7 @@ type CreateCommentParams struct {
 	Downvotes    int32
 	Userid       uuid.NullUUID
 	Postid       uuid.NullUUID
+	Name         sql.NullString
 }
 
 func (q *Queries) CreateComment(ctx context.Context, arg CreateCommentParams) (Comment, error) {
@@ -40,6 +41,7 @@ func (q *Queries) CreateComment(ctx context.Context, arg CreateCommentParams) (C
 		arg.Downvotes,
 		arg.Userid,
 		arg.Postid,
+		arg.Name,
 	)
 	var i Comment
 	err := row.Scan(
@@ -51,6 +53,7 @@ func (q *Queries) CreateComment(ctx context.Context, arg CreateCommentParams) (C
 		&i.Downvotes,
 		&i.Userid,
 		&i.Postid,
+		&i.Name,
 	)
 	return i, err
 }
@@ -78,18 +81,24 @@ func (q *Queries) DeleteComment(ctx context.Context, arg DeleteCommentParams) (i
 const editComment = `-- name: EditComment :execrows
 
 UPDATE Comments
-SET Content = $3, IsEdited = true
+SET Content = $3, IsEdited = true, LastModified=$4
 WHERE UserID = $2 and CommentID = $1
 `
 
 type EditCommentParams struct {
-	Commentid uuid.UUID
-	Userid    uuid.NullUUID
-	Content   sql.NullString
+	Commentid    uuid.UUID
+	Userid       uuid.NullUUID
+	Content      sql.NullString
+	Lastmodified time.Time
 }
 
 func (q *Queries) EditComment(ctx context.Context, arg EditCommentParams) (int64, error) {
-	result, err := q.db.ExecContext(ctx, editComment, arg.Commentid, arg.Userid, arg.Content)
+	result, err := q.db.ExecContext(ctx, editComment,
+		arg.Commentid,
+		arg.Userid,
+		arg.Content,
+		arg.Lastmodified,
+	)
 	if err != nil {
 		return 0, err
 	}
@@ -98,30 +107,73 @@ func (q *Queries) EditComment(ctx context.Context, arg EditCommentParams) (int64
 
 const getComments = `-- name: GetComments :many
 
-SELECT commentid, content, lastmodified, isedited, upvotes, downvotes, userid, postid FROM Comments 
+SELECT commentid, content, lastmodified, isedited, upvotes, downvotes, userid, postid, name FROM Comments 
 WHERE PostID = $1
+OFFSET $2
+LIMIT $3
 `
 
-func (q *Queries) GetComments(ctx context.Context, postid uuid.NullUUID) ([]Comment, error) {
-	rows, err := q.db.QueryContext(ctx, getComments, postid)
+type CommentNotNull struct {
+	Commentid    uuid.UUID
+	Content      string
+	Lastmodified time.Time
+	Isedited     bool
+	Upvotes      int32
+	Downvotes    int32
+	Userid       uuid.UUID
+	Postid       uuid.UUID
+	Name         string
+}
+
+type GetCommentsParams struct {
+	Postid uuid.NullUUID
+	Offset int32
+	Limit  int32
+}
+
+func (q *Queries) GetComments(ctx context.Context, arg GetCommentsParams) ([]CommentNotNull, error) {
+	rows, err := q.db.QueryContext(ctx, getComments, arg.Postid, arg.Offset, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Comment
+	var items []CommentNotNull
 	for rows.Next() {
-		var i Comment
+		var i CommentNotNull
+		var content, name sql.NullString
+		var user, post uuid.NullUUID
 		if err := rows.Scan(
 			&i.Commentid,
-			&i.Content,
+			&content,
 			&i.Lastmodified,
 			&i.Isedited,
 			&i.Upvotes,
 			&i.Downvotes,
-			&i.Userid,
-			&i.Postid,
+			&user,
+			&post,
+			&name,
 		); err != nil {
 			return nil, err
+		}
+		if content.Valid == true {
+			i.Content = content.String
+		} else {
+			i.Content = ""
+		}
+		if name.Valid == true {
+			i.Name = name.String
+		} else {
+			i.Name = ""
+		}
+		if user.Valid == true {
+			i.Userid = user.UUID
+		} else {
+			i.Userid = uuid.UUID{}
+		}
+		if post.Valid == true {
+			i.Postid = post.UUID
+		} else {
+			i.Postid = uuid.UUID{}
 		}
 		items = append(items, i)
 	}

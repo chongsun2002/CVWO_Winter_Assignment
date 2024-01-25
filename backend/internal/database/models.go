@@ -20,6 +20,7 @@ type Comment struct {
 	Downvotes    int32
 	Userid       uuid.NullUUID
 	Postid       uuid.NullUUID
+	Name         sql.NullString
 }
 
 type Post struct {

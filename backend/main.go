@@ -70,7 +70,11 @@ func main(){
 	v1Router.Post("/createuser", apiCfg.handlerCreateUser)
 	v1Router.Post("/changepassword", apiCfg.handlerChangePassword)
 	v1Router.Post("/login", apiCfg.handlerAuthenticateUser)
-	//v1Router.Post("/authenticate")
+	// Comment related
+	v1Router.Get("/comments/{id}", apiCfg.handlerGetComments)
+	v1Router.Post("/createcomment", apiCfg.handlerCreateComment)
+	v1Router.Post("/editcomment", apiCfg.handlerEditComment)
+	v1Router.Post("/deletecomment", apiCfg.handlerDeleteComment)
 	
 	router.Mount("/v1", v1Router)
 

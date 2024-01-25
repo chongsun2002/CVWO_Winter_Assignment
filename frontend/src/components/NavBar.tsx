@@ -21,13 +21,6 @@ const NavBar: React.FC = () => {
                 </HStack>
             </LinkBox>
             <Spacer/>
-            <InputGroup width="40vw">
-                <InputLeftElement>
-                    <SearchIcon />
-                </InputLeftElement>
-                <Input placeholder="Search Posts" />
-            </InputGroup>
-            <Spacer/>
             {user == null ? (
                 <ButtonGroup gap='6' mr='5vw'>
                     <Button colorScheme='teal'>
